@@ -1,5 +1,5 @@
 const SelectedPage = () => {
-  return <div>Some Posts: </div>;
+  return <div>some Posts:</div>;
 };
 
 export default SelectedPage;

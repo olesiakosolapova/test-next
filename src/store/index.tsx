@@ -1,8 +1,7 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, ThunkAction, ThunkDispatch } from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
 import axios from "axios";
 
-// Define the interfaces for the store state and the API response
 interface MenuItem {
   name: string;
   uri: string;
@@ -24,15 +23,18 @@ interface MenuApiResponse {
   data: MenuData;
 }
 
-interface StoreState {
+export interface StoreState {
   links: MenuItem[];
 }
 
-// Define the action types
 export const FETCH_MENU_SUCCESS = "FETCH_MENU_SUCCESS";
 export const FETCH_MENU_FAILURE = "FETCH_MENU_FAILURE";
+export const FETCH_MENU = "FETCH_MENU";
 
-// Define the action interfaces
+interface FetchMenuAction {
+  type: typeof FETCH_MENU;
+}
+
 interface FetchMenuSuccessAction {
   type: typeof FETCH_MENU_SUCCESS;
   payload: MenuItem[];
@@ -43,14 +45,15 @@ interface FetchMenuFailureAction {
   payload: string;
 }
 
-type MenuAction = FetchMenuSuccessAction | FetchMenuFailureAction;
+export type MenuAction =
+  | FetchMenuSuccessAction
+  | FetchMenuFailureAction
+  | FetchMenuAction;
 
-// Define the initial store state
 const initialState: StoreState = {
   links: [],
 };
 
-// Define the Redux reducer
 export const menuReducer = (state = initialState, action: MenuAction) => {
   switch (action.type) {
     case FETCH_MENU_SUCCESS:
@@ -60,7 +63,6 @@ export const menuReducer = (state = initialState, action: MenuAction) => {
   }
 };
 
-// Define the action creators
 export const fetchMenuSuccess = (links: MenuItem[]): FetchMenuSuccessAction => {
   return {
     type: FETCH_MENU_SUCCESS,
@@ -75,9 +77,14 @@ export const fetchMenuFailure = (error: string): FetchMenuFailureAction => {
   };
 };
 
-// Define the async action using thunk middleware
-export const fetchMenu = () => {
-  return async (dispatch: any) => {
+export const fetchMenu = (): ThunkAction<
+  Promise<void>,
+  StoreState,
+  undefined,
+  MenuAction
+> => {
+  return async (dispatch: ThunkDispatch<StoreState, undefined, MenuAction>) => {
+    dispatch({ type: FETCH_MENU });
     try {
       const res = await axios.get<MenuApiResponse>(
         "https://acecmsmock.z6.web.core.windows.net/api/content/2"
@@ -91,7 +98,7 @@ export const fetchMenu = () => {
   };
 };
 
-const store = configureStore({
+export const store = configureStore({
   reducer: menuReducer,
   middleware: [thunk],
 });
