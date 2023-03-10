@@ -1,12 +1,8 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Link from "next/link";
 import { ThunkDispatch } from "@reduxjs/toolkit";
-import {
-  fetchMenuFooter,
-  MenuAction,
-  StoreStateFooter,
-} from "@/store/indexfoter";
+import { fetchFooter } from "@/store/index";
+import { StoreStateFooter, FooterAction } from "@/store/interfaces";
 
 export interface FooterLink {
   name: string;
@@ -38,21 +34,31 @@ export interface FooterData {
 }
 
 export const Footer2 = () => {
-  const data: FooterData[] = useSelector(
+  const data: FooterData | null = useSelector(
     (state: StoreStateFooter) => state.data
   );
   console.log(data);
   const dispatch =
-    useDispatch<ThunkDispatch<StoreStateFooter, undefined, MenuAction>>();
+    useDispatch<ThunkDispatch<StoreStateFooter, undefined, FooterAction>>();
 
   useEffect(() => {
-    dispatch(fetchMenuFooter());
-  }, []);
+    dispatch(fetchFooter());
+  }, [dispatch]);
+  if (!data) return null;
   return (
     <footer
       style={{ backgroundColor: "#f5f5f5", padding: "20px", marginTop: "50px" }}
     >
-      {data.length > 0 ? <div>{data[0].name}</div> : <div>Loading...</div>}
+      {data.data.columns.map(({ links }) => {
+        return (
+          <ul>
+            {" "}
+            {links.map(({ name, url }) => {
+              return <li key={name}>{name}</li>;
+            })}
+          </ul>
+        );
+      })}
     </footer>
   );
 };

@@ -5,7 +5,6 @@ import { Navbar } from "./Navbar";
 import { Nav } from "./Nav";
 import { Provider } from "react-redux";
 import store from "@/store";
-import storef from "@/store/indexfoter";
 
 type propsChildren = {
   children: any;
@@ -18,7 +17,7 @@ export const Layout = (props: propsChildren) => {
         <Nav />
       </Provider>
       {props.children}
-      <Provider store={storef}>
+      <Provider store={store}>
         <Footer2 />
       </Provider>
       {/* <Footer /> */}

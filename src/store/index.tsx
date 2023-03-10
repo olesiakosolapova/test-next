@@ -1,105 +1,119 @@
-import { configureStore, ThunkAction, ThunkDispatch } from "@reduxjs/toolkit";
+import {
+  combineReducers,
+  configureStore,
+  ThunkAction,
+  ThunkDispatch,
+} from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
 import axios from "axios";
+import { footerReducer } from "./footerReducer";
+import {
+  NavbarAction,
+  NavbarApiResponse,
+  NavbarItem,
+  StoreState,
+  FETCH_NAVBAR,
+  FETCH_NAVBAR_FAILURE,
+  FETCH_NAVBAR_SUCCESS,
+  FetchNavbarSuccessAction,
+  FetchNavbarFailureAction,
+} from "./interfaces";
+import { navbarReducer } from "./navbarReducer";
+import {
+  FooterData,
+  StoreStateFooter,
+  FooterAction,
+  FETCH_FOOTER,
+  FETCH_FOOTER_SUCCESS,
+  FETCH_FOOTER_FAILURE,
+  FetchFooterSuccessAction,
+  FetchFooterFailureAction,
+} from "./interfaces";
 
-interface MenuItem {
-  name: string;
-  uri: string;
-}
-
-interface MenuData {
-  items: MenuItem[];
-}
-
-interface MenuApiResponse {
-  id: number;
-  name: string;
-  slug: string;
-  locale: string;
-  publishDate: string;
-  web: {
-    id: number;
-  };
-  data: MenuData;
-}
-
-export interface StoreState {
-  links: MenuItem[];
-}
-
-export const FETCH_MENU_SUCCESS = "FETCH_MENU_SUCCESS";
-export const FETCH_MENU_FAILURE = "FETCH_MENU_FAILURE";
-export const FETCH_MENU = "FETCH_MENU";
-
-interface FetchMenuAction {
-  type: typeof FETCH_MENU;
-}
-
-interface FetchMenuSuccessAction {
-  type: typeof FETCH_MENU_SUCCESS;
-  payload: MenuItem[];
-}
-
-interface FetchMenuFailureAction {
-  type: typeof FETCH_MENU_FAILURE;
-  payload: string;
-}
-
-export type MenuAction =
-  | FetchMenuSuccessAction
-  | FetchMenuFailureAction
-  | FetchMenuAction;
-
-const initialState: StoreState = {
-  links: [],
-};
-
-export const menuReducer = (state = initialState, action: MenuAction) => {
-  switch (action.type) {
-    case FETCH_MENU_SUCCESS:
-      return { ...state, links: action.payload };
-    default:
-      return state;
-  }
-};
-
-export const fetchMenuSuccess = (links: MenuItem[]): FetchMenuSuccessAction => {
+export const fetchNavbarSuccess = (
+  links: NavbarItem[]
+): FetchNavbarSuccessAction => {
   return {
-    type: FETCH_MENU_SUCCESS,
+    type: FETCH_NAVBAR_SUCCESS,
     payload: links,
   };
 };
 
-export const fetchMenuFailure = (error: string): FetchMenuFailureAction => {
+export const fetchNavbarFailure = (error: string): FetchNavbarFailureAction => {
   return {
-    type: FETCH_MENU_FAILURE,
+    type: FETCH_NAVBAR_FAILURE,
     payload: error,
   };
 };
 
-export const fetchMenu = (): ThunkAction<
+export const fetchFooterSuccess = (
+  data: FooterData | null
+): FetchFooterSuccessAction => {
+  return {
+    type: FETCH_FOOTER_SUCCESS,
+    payload: data,
+  };
+};
+
+export const fetchFooterFailure = (error: string): FetchFooterFailureAction => {
+  return {
+    type: FETCH_FOOTER_FAILURE,
+    payload: error,
+  };
+};
+
+export const fetchNavbar = (): ThunkAction<
   Promise<void>,
   StoreState,
   undefined,
-  MenuAction
+  NavbarAction
 > => {
-  return async (dispatch: ThunkDispatch<StoreState, undefined, MenuAction>) => {
-    dispatch({ type: FETCH_MENU });
+  return async (
+    dispatch: ThunkDispatch<StoreState, undefined, NavbarAction>
+  ) => {
+    dispatch({ type: FETCH_NAVBAR });
     try {
-      const res = await axios.get<MenuApiResponse>(
+      const res = await axios.get<NavbarApiResponse>(
         "https://acecmsmock.z6.web.core.windows.net/api/content/2"
       );
       const response = res.data.data;
-      dispatch(fetchMenuSuccess(response.items));
+      dispatch(fetchNavbarSuccess(response.items));
     } catch (error: any) {
       console.error(error);
-      dispatch(fetchMenuFailure(error.message));
+      dispatch(fetchNavbarFailure(error.message));
     }
   };
 };
 
+export const fetchFooter = (): ThunkAction<
+  Promise<void>,
+  StoreStateFooter,
+  undefined,
+  FooterAction
+> => {
+  return async (
+    dispatch: ThunkDispatch<StoreStateFooter, undefined, FooterAction>
+  ) => {
+    dispatch({ type: FETCH_FOOTER });
+    try {
+      const res = await axios.get<FooterData | null>(
+        "https://acecmsmock.z6.web.core.windows.net/api/content/1"
+      );
+      const data = res.data;
+      dispatch(fetchFooterSuccess(data));
+    } catch (error: any) {
+      console.error(error);
+      dispatch(fetchFooterFailure(error.message));
+    }
+  };
+};
+
+export const rootReducer = combineReducers({
+  navbar: navbarReducer,
+  footer: footerReducer,
+});
 export const store = configureStore({
-  reducer: menuReducer,
+  reducer: rootReducer,
   middleware: [thunk],
 });
 
