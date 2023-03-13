@@ -19,33 +19,6 @@ export interface NavbarApiResponse {
   data: NavbarData;
 }
 
-export interface StoreState {
-  links: NavbarItem[];
-}
-
-export const FETCH_NAVBAR_SUCCESS = "FETCH_NAVBAR_SUCCESS";
-export const FETCH_NAVBAR_FAILURE = "FETCH_NAVBAR_FAILURE";
-export const FETCH_NAVBAR = "FETCH_NAVBAR";
-
-export interface FetchNavbarAction {
-  type: typeof FETCH_NAVBAR;
-}
-
-export interface FetchNavbarSuccessAction {
-  type: typeof FETCH_NAVBAR_SUCCESS;
-  payload: NavbarItem[];
-}
-
-export interface FetchNavbarFailureAction {
-  type: typeof FETCH_NAVBAR_FAILURE;
-  payload: string;
-}
-
-export type NavbarAction =
-  | FetchNavbarSuccessAction
-  | FetchNavbarFailureAction
-  | FetchNavbarAction;
-
 export interface FooterLink {
   name: string;
   url: string;
@@ -75,6 +48,33 @@ export interface FooterData {
   };
 }
 
+export interface StoreState {
+  links: NavbarItem[];
+}
+
+export const FETCH_NAVBAR_SUCCESS = "FETCH_NAVBAR_SUCCESS";
+export const FETCH_NAVBAR_FAILURE = "FETCH_NAVBAR_FAILURE";
+export const FETCH_NAVBAR = "FETCH_NAVBAR";
+
+export interface FetchNavbarAction {
+  type: typeof FETCH_NAVBAR;
+}
+
+export interface FetchNavbarSuccessAction {
+  type: typeof FETCH_NAVBAR_SUCCESS;
+  payload: NavbarItem[];
+}
+
+export interface FetchNavbarFailureAction {
+  type: typeof FETCH_NAVBAR_FAILURE;
+  payload: string;
+}
+
+export type NavbarAction =
+  | FetchNavbarSuccessAction
+  | FetchNavbarFailureAction
+  | FetchNavbarAction;
+
 export interface StoreStateFooter {
   data: FooterData | null;
 }
@@ -100,3 +100,8 @@ export type FooterAction =
   | FetchFooterFailureAction
   | FetchFooterSuccessAction
   | FetchFooterAction;
+
+export interface StoreStateAll {
+  navbar: StoreState;
+  footer: StoreStateFooter;
+}

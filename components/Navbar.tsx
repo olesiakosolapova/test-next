@@ -1,43 +1,21 @@
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
-import axios from "axios";
-import { useEffect, useState } from "react";
-
-interface Menu {
-  id: number;
-  name: string;
-  slug: string;
-  locale: string;
-  publishDate: string;
-  web: {
-    id: number;
-  };
-  data: {
-    items: MenuItem[];
-  };
-}
-
-interface MenuItem {
-  name: string;
-  uri: string;
-}
+import { ThunkDispatch } from "@reduxjs/toolkit";
+import { fetchNavbar } from "@/store";
+import { NavbarAction, StoreStateAll } from "@/store/interfaces";
+import { NavbarItem } from "@/store/interfaces";
 
 export const Navbar = () => {
-  const [links, setLinks] = useState<MenuItem[]>();
-  console.log(links);
+  const links: NavbarItem[] = useSelector(
+    (state: StoreStateAll) => state.navbar.links
+  );
+
+  const dispatch =
+    useDispatch<ThunkDispatch<StoreStateAll, undefined, NavbarAction>>();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get<Menu>(
-          "https://acecmsmock.z6.web.core.windows.net/api/content/2"
-        );
-        const response = res.data.data;
-        setLinks(response.items);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchData();
+    dispatch(fetchNavbar());
   }, []);
 
   return (
